@@ -1,24 +1,24 @@
-let cards = null
-var arcanesOnly = false
+let cards = Array()
+let arcanesOnly = false
+let numberOfCards = null
+let setUps = Object()
 
 let turnBackAllCards = function(){
-    $("#card1").attr("src", "deck/cardback.jpg")
-    $("#card2").attr("src", "deck/cardback.jpg")
-    $("#card3").attr("src", "deck/cardback.jpg")
+    for(i = 1; i <= numberOfCards; i++){
+        $("#card" + i).attr("src", "deck/cardback.jpg")
+    }
 }
 
 let drawCards = function(){
-    
-    card1 = card2 = card3 = null    
+
     total = (arcanesOnly) ? 21 : 78
+    cards = Array()
 
-    while(card1 == card2 || card1 == card3 || card2 == card3){
-        card1 = Math.floor((Math.random() * 100) % total)
-        card2 = Math.floor((Math.random() * 100) % total)
-        card3 = Math.floor((Math.random() * 100) % total)
-    }    
-
-    cards = [card1, card2, card3]
+    while(cards.length < numberOfCards){
+        newCard = Math.floor((Math.random() * 100) % total)
+        if(cards.indexOf(newCard) == -1)
+            cards.push(newCard)
+    }
 
     return true
 }
@@ -34,14 +34,32 @@ let showCard = function(n){
 let showDrawedCards = function(){
     turnBackAllCards()
     drawCards()
-    setTimeout(showCard, 1500, 1)
-    setTimeout(showCard, 3000, 2)
-    setTimeout(showCard, 4500, 3)
+    for(i = 0; i < numberOfCards; i++){
+        setTimeout(showCard, 1500 * i, i + 1)
+    }
 }
 
 $(document).ready(function(){
+    numberOfCards = Number($("#numberOfCards").val())
+    setUps[1] = 12
+    setUps[3] = 4
+    setUps[5] = 4
+    setUps[7] = 3
+
     $("#draw-btn").click(showDrawedCards)
+
     $("#arcanesSelector").change(function(){
-        arcanesOnly = $(this).val()
+        arcanesOnly = ($(this).val() == "true") ? true : false
+    })
+
+    $("#numberOfCards").change(function(){
+        table = $("#table")
+        table.empty()
+        numberOfCards = Number($(this).val())
+        cols = setUps[numberOfCards]
+        for(i = 0; i < numberOfCards; i++){
+            newElement = $('<div class="col-' + cols + ' d-flex justify-content-center mb-2"><img src="deck/cardback.jpg" id="card' + (i+1) + '" class="img-fluid"></div>')
+            table.append(newElement)
+        }
     })
 })
